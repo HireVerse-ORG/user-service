@@ -1,68 +1,53 @@
-import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    CreateDateColumn,
-    UpdateDateColumn,
-    BeforeInsert,
-    BeforeUpdate,
-    BaseEntity,
-} from 'typeorm';
-import { IsEmail, IsBoolean, IsEnum, Length } from 'class-validator';
-import bcrypt from 'bcryptjs';
+import mongoose, { Schema, Document } from "mongoose";
+import bcrypt from "bcryptjs";
 
 export enum UserRole {
-    ADMIN = 'admin',
-    USER = 'user',
-    COMPANY = 'company',
+    ADMIN = "admin",
+    USER = "user",
+    COMPANY = "company",
 }
 
-@Entity('users')
-export class User extends BaseEntity {
-    @PrimaryGeneratedColumn('uuid')
-    id!: string;
-
-    @Column({ unique: true })
-    @IsEmail()
-    email!: string;
-
-    @Column()
-    @Length(6, 20)
-    password!: string;
-
-    @Column({
-        type: 'enum',
-        enum: UserRole,
-        default: UserRole.USER,
-    })
-    @IsEnum(UserRole)
-    role!: UserRole;
-
-    @Column({ default: false })
-    @IsBoolean()
-    isVerified!: boolean;
-
-    @Column({ default: false })
-    @IsBoolean()
-    isBlocked!: boolean;
-
-    @CreateDateColumn({ type: 'timestamp' })
-    createdAt!: Date;
-
-    @UpdateDateColumn({ type: 'timestamp' })
-    updatedAt!: Date;
-
-    @BeforeInsert()
-    @BeforeUpdate()
-    async hashPassword() {
-        if (this.password) {
-            const salt = await bcrypt.genSalt(10);
-            this.password = await bcrypt.hash(this.password, salt);
-        }
-    }
-
-    async validatePassword(password: string): Promise<boolean> {
-        return bcrypt.compare(password, this.password);
-    }
+export interface IUser extends Document {
+    id: string;
+    fullname: string;
+    email: string;
+    password: string;
+    role: UserRole;
+    isVerified: boolean;
+    isBlocked: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    validatePassword(password: string): Promise<boolean>;
 }
 
+const userSchema = new Schema<IUser>(
+    {
+        fullname: { type: String, trim: true },
+        email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+        password: { type: String, required: true, minlength: 6, maxlength: 20 },
+        role: {
+            type: String,
+            enum: [UserRole.ADMIN, UserRole.USER, UserRole.COMPANY],
+            default: UserRole.USER,
+        },
+        isVerified: { type: Boolean, default: false },
+        isBlocked: { type: Boolean, default: false },
+    },
+    { timestamps: true } 
+);
+
+userSchema.pre<IUser>("save", async function (next) {
+    if (this.isModified("password")) {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+    }
+    next();
+});
+
+userSchema.methods.validatePassword = async function (password: string): Promise<boolean> {
+    return bcrypt.compare(password, this.password);
+};
+
+const User = mongoose.model<IUser>("User", userSchema);
+
+export default User;

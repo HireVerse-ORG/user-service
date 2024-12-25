@@ -6,5 +6,8 @@ export default {
     UserService: Symbol('UserService'),
     UserController: Symbol('UserController'),
     UserRepository: Symbol('UserRepository'),
+    OtpService: Symbol('OtpService'),
+    OtpController: Symbol('OtpController'),
+    OtpRepository: Symbol('OtpRepository'),
   };
   

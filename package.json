@@ -11,18 +11,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@grpc/grpc-js": "^1.12.5",
     "@hireverse/service-common": "^1.0.5",
     "bcryptjs": "^2.4.3",
-    "class-validator": "^0.14.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "inversify": "^6.2.1",
+    "mongoose": "^8.9.2",
     "morgan": "^1.10.0",
-    "pg": "^8.13.1",
-    "reflect-metadata": "^0.2.2",
-    "typeorm": "^0.3.20",
-    "uuid": "^11.0.3"
+    "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

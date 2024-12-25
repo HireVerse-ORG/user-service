@@ -2,9 +2,9 @@ import { BadRequestError } from "@hireverse/service-common/dist/app.errors";
 import { UserCreateDto, UserValidateDto } from "./dto/user.dto";
 import { IUserRepository } from "./interfaces/user.repository.interface";
 import { IUserService } from "./interfaces/user.service.interface";
-import { validate as validateUuid } from 'uuid';
 import { inject, injectable } from "inversify";
 import TYPES from '../../core/types';
+import { isValidObjectId } from "mongoose";
 
 @injectable()
 export class UserService implements IUserService {
@@ -33,7 +33,7 @@ export class UserService implements IUserService {
   }
 
   async getUserById(id: string) {
-    if (!validateUuid(id)) {
+    if (!isValidObjectId(id)) {
       throw new BadRequestError('Invalid user ID format');
     }
 

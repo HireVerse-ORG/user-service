@@ -1,7 +1,7 @@
 import { IRepository } from "@hireverse/service-common/dist/repository/repository.interface";
-import { User } from "../user.entity";
+import { IUser } from "../user.entity";
 
-export interface IUserRepository extends IRepository<User> {
+export interface IUserRepository extends IRepository<IUser> {
     isEmailExist(email: string): Promise<boolean>;
-    findByEmail(email: string): Promise<User | null>;
+    findByEmail(email: string): Promise<IUser | null>;
 }

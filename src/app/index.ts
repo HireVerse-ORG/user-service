@@ -1,28 +1,33 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
 import 'reflect-metadata';
 import express, { Application } from 'express';
 import { registerRoutes } from './appRoutes';
 import { registerMiddlewares } from './appMiddlewares';
-import { closeDb, connectDb } from '../core/database/ormconfig';
 import { logger } from '../core/utils/logger';
+import Database from '../core/databse';
 
 class Server {
     public app: Application;
     private server: any;
+    private database: Database;
 
-    constructor() {
+    constructor(private dbUrl: string) {
         this.app = express();
+        this.database = new Database(dbUrl); 
         this.initialize();
     }
 
     async initialize() {
-        await connectDb();
-        registerMiddlewares(this.app);
-        registerRoutes(this.app);
-        process.on('SIGINT', this.shutdown.bind(this));
-        process.on('SIGTERM', this.shutdown.bind(this));
+        try {
+            await this.database.connect(); 
+            registerMiddlewares(this.app);
+            registerRoutes(this.app);
+
+            process.on("SIGINT", this.shutdown.bind(this));
+            process.on("SIGTERM", this.shutdown.bind(this));
+        } catch (error) {
+            logger.error("Error during initialization:", error);
+            process.exit(1);
+        }
     }
 
     start(PORT: string) {
@@ -32,19 +37,20 @@ class Server {
     }
 
     private async shutdown() {
-        logger.info('Shutting down User Server...');
+        logger.info("Shutting down User Server...");
         try {
-            closeDb();
             this.server?.close(() => {
-                logger.info('User Server shut down gracefully.');
-                process.exit(0);
+                logger.info("User Server shut down gracefully.");
             });
+
+            await this.database.disconnect();
+
+            process.exit(0);
         } catch (error) {
-            logger.error('Error during shutdown:', error);
+            logger.error("Error during shutdown:", error);
             process.exit(1);
         }
     }
 }
 
-
-export default Server
+export default Server;

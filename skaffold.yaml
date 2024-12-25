@@ -1,0 +1,14 @@
+apiVersion: skaffold/v4beta12
+kind: Config
+metadata:
+  name: user-service
+build:
+  artifacts:
+    - image: hireverse/user-server
+      docker:
+        dockerfile: Dockerfile
+        target: development
+manifests:
+  rawYaml:
+    - k8s/user-depl.yaml
+    - k8s/user.secrets.yaml

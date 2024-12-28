@@ -1,5 +1,5 @@
 import { BadRequestError, NotFoundError } from "@hireverse/service-common/dist/app.errors";
-import { UserCreateDto, UserDto, UserUpdateDto, UserValidateDto } from "./dto/user.dto";
+import { UpdatePasswordDto, UserCreateDto, UserDto, UserUpdateDto, UserValidateDto } from "./dto/user.dto";
 import { IUserRepository } from "./interfaces/user.repository.interface";
 import { IUserService } from "./interfaces/user.service.interface";
 import { inject, injectable } from "inversify";
@@ -66,6 +66,17 @@ export class UserService implements IUserService {
       throw new BadRequestError('User not found');
     }
     return this.userResponse(user);
+  }
+
+  async updatePassword(data: UpdatePasswordDto): Promise<string> {
+      const user = await this.repo.findById(data.userid);
+      if(!user){
+        throw new NotFoundError("User not found");
+      }
+      user.password = data.password;
+      user.save();
+
+      return "Password updated"
   }
 
   private userResponse(userData: IUser): UserDto{

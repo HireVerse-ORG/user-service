@@ -1,4 +1,4 @@
-import { UserCreateDto, UserDto, UserValidateDto } from "../dto/user.dto";
+import { UpdatePasswordDto, UserCreateDto, UserDto, UserValidateDto } from "../dto/user.dto";
 
 export interface IUserService {
     validateUser(data: UserValidateDto): Promise<UserDto>;
@@ -6,4 +6,5 @@ export interface IUserService {
     verifyUser(email: string): Promise<UserDto>;
     getUserById(id: string): Promise<UserDto>;
     getUserByEmail(email: string): Promise<UserDto>;
+    updatePassword(data: UpdatePasswordDto): Promise<string>;
 }

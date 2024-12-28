@@ -13,4 +13,7 @@ router.get("/", isAuthenticated, userController.getUser);
 router.post("/login", userController.login);
 router.post("/register", userController.create);
 
+router.post("/request-password-reset", userController.requestPasswordReset);
+router.post("/reset-password", userController.resetPassword);
+
 export const userRoutes = router;

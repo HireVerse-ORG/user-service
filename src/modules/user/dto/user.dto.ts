@@ -19,6 +19,11 @@ export interface UserUpdateDto {
     isBlocked?: boolean;
 }
 
+export interface UpdatePasswordDto {
+    userid: string;
+    password: string;
+}
+
 export interface UserDto {
     id: string;
     fullname: string;

@@ -1,7 +1,9 @@
 import { UserCreateDto, UserDto, UserValidateDto } from "../dto/user.dto";
 
 export interface IUserService {
-    validateUser(data: UserValidateDto): Promise<{message: string, userId: string, role: string}>;
-    createUser(data: UserCreateDto): Promise<{message: string, userId: string, role: string}>;
-    getUserById(id: string): Promise<UserDto | null>;
+    validateUser(data: UserValidateDto): Promise<UserDto>;
+    createUser(data: UserCreateDto): Promise<UserDto>;
+    verifyUser(email: string): Promise<UserDto>;
+    getUserById(id: string): Promise<UserDto>;
+    getUserByEmail(email: string): Promise<UserDto>;
 }

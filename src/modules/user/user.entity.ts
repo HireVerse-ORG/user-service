@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 
 export enum UserRole {
     ADMIN = "admin",
-    USER = "user",
+    SEEKER = "seeker",
     COMPANY = "company",
 }
 
@@ -24,11 +24,11 @@ const userSchema = new Schema<IUser>(
     {
         fullname: { type: String, trim: true },
         email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-        password: { type: String, required: true, minlength: 6, maxlength: 20 },
+        password: { type: String, required: true},
         role: {
             type: String,
-            enum: [UserRole.ADMIN, UserRole.USER, UserRole.COMPANY],
-            default: UserRole.USER,
+            enum: [UserRole.ADMIN, UserRole.SEEKER, UserRole.COMPANY],
+            default: UserRole.SEEKER,
         },
         isVerified: { type: Boolean, default: false },
         isBlocked: { type: Boolean, default: false },

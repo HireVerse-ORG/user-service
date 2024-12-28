@@ -3,14 +3,13 @@ import { UserService } from "./user.service";
 import { IUserRepository } from "./interfaces/user.repository.interface";
 import { UserRepository } from "./user.repository";
 import { UserController } from "./user.controller";
-import { container } from "../../core/inversify";
 import TYPES from '../../core/types';
+import { Container } from "inversify";
 
+function loadUserContainer(container: Container) {
+    container.bind<IUserService>(TYPES.UserService).to(UserService);
+    container.bind<IUserRepository>(TYPES.UserRepository).to(UserRepository);
+    container.bind<UserController>(TYPES.UserController).to(UserController);
+}
 
-const usercontainer = container.createChild();
-
-container.bind<IUserService>(TYPES.UserService).to(UserService);
-container.bind<IUserRepository>(TYPES.UserRepository).to(UserRepository);
-container.bind<UserController>(TYPES.UserController).to(UserController);
-
-export { usercontainer };
+export { loadUserContainer };

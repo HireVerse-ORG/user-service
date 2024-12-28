@@ -1,13 +1,16 @@
 import { Router } from "express";
 import { UserController } from "./user.controller";
 import TYPES from '../../core/types';
-import { usercontainer } from "./user.module";
+import { container } from "../../core/inversify";
+import {isAuthenticated} from "@hireverse/service-common/dist/token/user/userMiddleware";
 
 const router = Router();
-const userController = usercontainer.get<UserController>(TYPES.UserController)
+const userController = container.get<UserController>(TYPES.UserController)
 
-router.post("/", (req, res) => userController.create(req, res));
-router.post("/login", (req, res) => userController.login(req, res));
-router.get("/:id", (req, res) => userController.getUser(req, res));
+
+router.get("/", isAuthenticated, userController.getUser);
+
+router.post("/login", userController.login);
+router.post("/register", userController.create);
 
 export const userRoutes = router;

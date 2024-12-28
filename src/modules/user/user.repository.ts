@@ -10,11 +10,11 @@ export class UserRepository extends MongoBaseRepository<IUser> implements IUserR
     }
 
     async isEmailExist(email: string): Promise<boolean> {
-        const exist = await this.model.findOne({email});
+        const exist = await this.findOne({email});
         return !!exist;
     }
     
     async findByEmail(email: string): Promise<IUser | null> {
-        return await this.model.findOne({email});
+        return await this.findOne({email});
     }
 }

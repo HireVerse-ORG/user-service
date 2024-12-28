@@ -8,4 +8,8 @@ export class OtpRepository extends MongoBaseRepository<IOTP> implements IOtpRepo
     constructor() {
         super(Otp)
     }
+
+    async findByEmail(email: string): Promise<IOTP | null> {
+        return await this.findOne({email})
+    }
 }

@@ -1,5 +1,5 @@
 import { Container } from "inversify";
-import TYPES from '../../core/types';
+import TYPES from '../../core/container/container.types';
 import { IOtpRepository } from "./interfaces/otp.repository";
 import { IOtpService } from "./interfaces/otp.service.interface";
 import { OtpController } from "./otp.controller";

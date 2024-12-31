@@ -3,7 +3,7 @@ import { UserService } from "./user.service";
 import { IUserRepository } from "./interfaces/user.repository.interface";
 import { UserRepository } from "./user.repository";
 import { UserController } from "./user.controller";
-import TYPES from '../../core/types';
+import TYPES from '../../core/container/container.types';
 import { Container } from "inversify";
 
 function loadUserContainer(container: Container) {

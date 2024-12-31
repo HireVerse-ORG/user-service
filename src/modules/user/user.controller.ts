@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import BaseController from "../../core/base.controller";
 import { IUserService } from "./interfaces/user.service.interface";
 import { inject, injectable } from "inversify";
-import TYPES from '../../core/types';
+import TYPES from '../../core/container/container.types';
 import asyncWrapper from '@hireverse/service-common/dist/utils/asyncWrapper';
 import { AuthRequest } from '@hireverse/service-common/dist/token/user/userRequest';
 import { resettokenService, tokenService } from '../../core/utils/token';
@@ -50,7 +50,6 @@ export class UserController extends BaseController {
     public getUser = asyncWrapper(async (req: AuthRequest, res: Response) => {
         const userId = req.payload?.userId;
         const user = await this.userService.getUserById(userId!);
-        console.log(user);
         res.json(user);
     })
 

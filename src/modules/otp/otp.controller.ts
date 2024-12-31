@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import BaseController from "../../core/base.controller";
 import { IOtpService } from "./interfaces/otp.service.interface";
-import TYPES from "../../core/types";
+import TYPES from "../../core/container/container.types";
 import { Request, Response } from 'express';
 import asyncWrapper from '@hireverse/service-common/dist/utils/asyncWrapper';
 import {mapGrpcErrorToHttpStatus} from '@hireverse/service-common/dist/utils/helper';

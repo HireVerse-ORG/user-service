@@ -1,7 +1,7 @@
 import express, { Application} from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
-import { tokenService } from '../core/utils/token';
+import { tokenService } from '../../core/utils/token';
 
 export function registerMiddlewares(app: Application) {
     app.use(express.json());

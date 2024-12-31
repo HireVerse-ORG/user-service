@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import { IOtpService } from "./interfaces/otp.service.interface";
 import { inject, injectable } from "inversify";
 import { IOtpRepository } from "./interfaces/otp.repository";
-import TYPES from "../../core/types";
+import TYPES from "../../core/container/container.types";
 import { GenerateOtpDto, VerifyOtpDto } from "./dto/otp.dto";
 import { NotFoundError } from "@hireverse/service-common/dist/app.errors";
 

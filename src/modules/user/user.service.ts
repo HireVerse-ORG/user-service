@@ -1,9 +1,9 @@
 import { BadRequestError, NotFoundError } from "@hireverse/service-common/dist/app.errors";
-import { UpdatePasswordDto, UserCreateDto, UserDto, UserUpdateDto, UserValidateDto } from "./dto/user.dto";
+import { UpdatePasswordDto, UserCreateDto, UserDto, UserValidateDto } from "./dto/user.dto";
 import { IUserRepository } from "./interfaces/user.repository.interface";
 import { IUserService } from "./interfaces/user.service.interface";
 import { inject, injectable } from "inversify";
-import TYPES from '../../core/types';
+import TYPES from '../../core/container/container.types';
 import { isValidObjectId } from "mongoose";
 import { IUser, UserRole } from "./user.entity";
 

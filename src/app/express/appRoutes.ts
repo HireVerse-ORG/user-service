@@ -1,6 +1,6 @@
 import { Application } from "express";
-import { userRoutes } from "../modules/user/user.routes";
-import { otpRoutes } from "../modules/otp/otp.routes";
+import { userRoutes } from "../../modules/user/user.routes";
+import { otpRoutes } from "../../modules/otp/otp.routes";
 import { errorHandler, notFoundHandler } from "./errorHandler";
 
 export function registerRoutes(app:Application, prefix="/api/user") {

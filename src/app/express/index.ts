@@ -2,8 +2,8 @@ import 'reflect-metadata';
 import express, { Application } from 'express';
 import { registerRoutes } from './appRoutes';
 import { registerMiddlewares } from './appMiddlewares';
-import { logger } from '../core/utils/logger';
-import Database from '../core/databse';
+import { logger } from '../../core/utils/logger';
+import Database from '../../core/databse';
 
 class Server {
     public app: Application;

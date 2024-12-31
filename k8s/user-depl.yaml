@@ -16,12 +16,20 @@ spec:
         - name: user
           image: hireverse/user-server
           env:
+            - name: CLIENT_ORIGIN
+              value: "http://localhost:3000"
+            - name: NOTIFICATION_SERVICE_URL
+              value: "http://notification-srv:6001"
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
                   name: user-secret
                   key: DATABASE_URL
-
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: common-secret
+                  key: JWT_SECRET_KEY
 ---
 apiVersion: v1
 kind: Service

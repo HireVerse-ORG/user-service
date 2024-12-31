@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import Server from './app';
-import { checkEnvVariables } from '@hireverse/service-common/dist/utils/envChecker';
+import Server from './app/express';
+import { checkEnvVariables } from '@hireverse/service-common/dist/utils';
 
 (async () => {
     checkEnvVariables('DATABASE_URL', 'JWT_SECRET_KEY', 'NOTIFICATION_SERVICE_URL', 'CLIENT_ORIGIN');

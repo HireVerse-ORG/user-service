@@ -1,12 +1,11 @@
 import { Router } from "express";
 import { UserController } from "./user.controller";
-import TYPES from '../../core/types';
-import { container } from "../../core/inversify";
+import TYPES from '../../core/container/container.types';
 import {isAuthenticated} from "@hireverse/service-common/dist/token/user/userMiddleware";
+import { container } from "../../core/container";
 
 const router = Router();
 const userController = container.get<UserController>(TYPES.UserController)
-
 
 router.get("/", isAuthenticated, userController.getUser);
 

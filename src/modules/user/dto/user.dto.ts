@@ -31,4 +31,5 @@ export interface UserDto {
     role: UserRole;
     isVerified: boolean;
     isBlocked: boolean;
+    createAt: Date;
 }

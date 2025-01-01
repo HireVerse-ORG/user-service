@@ -15,6 +15,25 @@ import { BadRequestError } from '@hireverse/service-common/dist/app.errors';
 export class UserController extends BaseController {
     @inject(TYPES.UserService) private userService!: IUserService;
 
+        /**
+    * @route PUT /user/auth/microsoft
+    * @scope Public
+    **/
+    public microsoftSignIn = asyncWrapper(async (req: AuthRequest, res: Response) => {
+        const { msToken, role } = req.body;
+        const user = await this.userService.verifyMicrosoftUser(msToken, role);
+        const token = tokenService.generateToken({
+            userId: user.id,
+            role: user.role,
+            isVerified: user.isVerified,
+            isBlocked: user.isBlocked,
+        })
+        res.json({
+            user,
+            token
+        });
+    });
+
     /**
    * @route GET /user/login
    * @scope Public
@@ -105,7 +124,7 @@ export class UserController extends BaseController {
   * @scope Private for admin
   **/
     public listUsers = asyncWrapper(async (req: AuthRequest, res: Response) => {
-        const { role, page=1, limit=10, query } = req.query;
+        const { role, page = 1, limit = 10, query } = req.query;
         const data = await this.userService.getUsersByRole(role as string, page as number, limit as number, query as string);
         return res.json(data);
     });

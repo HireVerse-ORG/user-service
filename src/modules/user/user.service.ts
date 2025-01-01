@@ -7,6 +7,7 @@ import TYPES from '../../core/container/container.types';
 import { FilterQuery, isValidObjectId } from "mongoose";
 import { IUser, UserRole } from "./user.entity";
 import { querySanitizer } from "@hireverse/service-common/dist/utils";
+import { microsoftConfig, verifyMsToken } from "../../core/utils/msutil";
 
 @injectable()
 export class UserService implements IUserService {
@@ -103,8 +104,8 @@ export class UserService implements IUserService {
 
     if (query) {
       filter.$or = [
-        { fullName: { $regex: query, $options: 'i' } }, 
-        { email: { $regex: query, $options: 'i' } },  
+        { fullName: { $regex: query, $options: 'i' } },
+        { email: { $regex: query, $options: 'i' } },
       ];
     }
 
@@ -113,6 +114,24 @@ export class UserService implements IUserService {
     return {
       ...paginatedData,
       data: transformedData
+    }
+  }
+
+  async verifyMicrosoftUser(accessToken: string, role: UserRole): Promise<UserDto> {
+    try {
+      const {name, preferred_username : email, sub} = await verifyMsToken(accessToken, microsoftConfig.clientId, microsoftConfig.authority);
+      if (!email || !name || !sub) {
+        throw new Error("Failed to autheticate using Microsoft");
+      }
+      let user = await this.repo.findOne({email});
+      if(!user){
+        user = await this.repo.create({email, fullname: name, password: sub, role, isVerified: true});
+      } else if(!user.isVerified){
+        await this.repo.update(user.id, {isVerified: true});
+      }
+      return this.userResponse(user);
+    } catch (error: any) {
+      throw new BadRequestError(error.message);
     }
   }
 

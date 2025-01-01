@@ -14,6 +14,8 @@ router.post("/register", userController.create);
 router.post("/request-password-reset", userController.requestPasswordReset);
 router.post("/reset-password", userController.resetPassword);
 
+router.post("/auth/microsoft", userController.microsoftSignIn);
+
 // admin routes
 router.get('/list', allowedRoles('admin'), userController.listUsers)
 router.put('/block-user', allowedRoles('admin'), userController.toggleUserBlockStatus)

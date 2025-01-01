@@ -62,7 +62,7 @@ export class UserController extends BaseController {
         const { email } = req.body;
         const user = await this.userService.getUserByEmail(email);
 
-        const expiry = 1000 * 60 * 5;
+        const expiry = new Date(Date.now() + 300000).toISOString();
         const resetToken = resettokenService.generateToken({ userid: user.id }, '5m');
         const resetUrl = `${process.env.CLIENT_ORIGIN}/auth/reset-password?token=${resetToken}&&expiry=${expiry}`;
         const html = resetPassTemplate(resetUrl);

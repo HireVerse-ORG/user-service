@@ -22,7 +22,7 @@ export class UserService implements IUserService {
       throw new BadRequestError('Invalid password');
     }
 
-    return this.userResponse(user);;
+    return this.userResponse(user);
   }
 
   async createUser(data: UserCreateDto, allowedRoles: UserRole[] = [UserRole.COMPANY, UserRole.SEEKER]) {

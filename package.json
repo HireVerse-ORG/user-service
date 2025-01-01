@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@hireverse/service-common": "^1.0.6",
+    "@hireverse/service-common": "^1.0.7",
     "@hireverse/service-protos": "^1.0.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",

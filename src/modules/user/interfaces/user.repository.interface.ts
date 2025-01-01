@@ -1,4 +1,4 @@
-import { IRepository, IMongoRepository } from "@hireverse/service-common/dist/repository/repository.interface";
+import { IMongoRepository } from "@hireverse/service-common/dist/repository/repository.interface";
 import { IUser } from "../user.entity";
 
 export interface IUserRepository extends IMongoRepository<IUser> {

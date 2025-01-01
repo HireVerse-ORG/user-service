@@ -1,29 +1,22 @@
-import 'reflect-metadata';
 import express, { Application } from 'express';
 import { registerRoutes } from './appRoutes';
 import { registerMiddlewares } from './appMiddlewares';
 import { logger } from '../../core/utils/logger';
-import Database from '../../core/databse';
 
 class Server {
     public app: Application;
     private server: any;
-    private database: Database;
 
-    constructor(private dbUrl: string) {
+    constructor() {
         this.app = express();
-        this.database = new Database(dbUrl); 
         this.initialize();
     }
 
     async initialize() {
         try {
-            await this.database.connect(); 
             registerMiddlewares(this.app);
             registerRoutes(this.app);
 
-            process.on("SIGINT", this.shutdown.bind(this));
-            process.on("SIGTERM", this.shutdown.bind(this));
         } catch (error) {
             logger.error("Error during initialization:", error);
             process.exit(1);
@@ -36,14 +29,12 @@ class Server {
         });
     }
 
-    private async shutdown() {
+    async stop() {
         logger.info("Shutting down User Server...");
         try {
             this.server?.close(() => {
                 logger.info("User Server shut down gracefully.");
             });
-
-            await this.database.disconnect();
 
             process.exit(0);
         } catch (error) {

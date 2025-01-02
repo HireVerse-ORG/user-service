@@ -119,8 +119,11 @@ export class UserService implements IUserService {
 
   async verifyMicrosoftUser(accessToken: string, role: UserRole): Promise<UserDto> {
     try {
-      const {name, preferred_username : email, sub} = await verifyMsToken(accessToken, microsoftConfig.clientId, microsoftConfig.authority);
-      if (!email || !name || !sub) {
+      const {name, email, sub} = await verifyMsToken(accessToken, microsoftConfig.clientId, microsoftConfig.authority);
+      if(!email){
+        throw new Error("Microsoft account does not have an email associated");
+      }
+      if (!name || !sub) {
         throw new Error("Failed to autheticate using Microsoft");
       }
       let user = await this.repo.findOne({email});

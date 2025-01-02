@@ -8,6 +8,7 @@ import { FilterQuery, isValidObjectId } from "mongoose";
 import { IUser, UserRole } from "./user.entity";
 import { querySanitizer } from "@hireverse/service-common/dist/utils";
 import { microsoftConfig, verifyMsToken } from "../../core/utils/msutil";
+import { fetchGoogleUserInfo } from "../../core/utils/googleutil";
 
 @injectable()
 export class UserService implements IUserService {
@@ -133,6 +134,33 @@ export class UserService implements IUserService {
         await this.repo.update(user.id, {isVerified: true});
       }
       return this.userResponse(user);
+    } catch (error: any) {
+      throw new BadRequestError(error.message);
+    }
+  }
+
+  async verifyGoogleUser(accessToken: string, role: UserRole): Promise<UserDto> {
+    try {
+
+      const {name, email, sub} = await fetchGoogleUserInfo(accessToken);
+
+      if (!email) {
+        throw new Error("Google account does not have an email associated");
+      }
+
+      if (!name || !sub) {
+        throw new Error("Failed to autheticate using Google");
+      }
+
+      let user = await this.repo.findOne({email: email});
+      if(!user){
+        user = await this.repo.create({email, fullname: name, password: sub, role, isVerified: true});
+      } else if(!user.isVerified){
+        await this.repo.update(user.id, {isVerified: true});
+      }
+
+      return this.userResponse(user);
+
     } catch (error: any) {
       throw new BadRequestError(error.message);
     }

@@ -15,6 +15,7 @@ router.post("/request-password-reset", userController.requestPasswordReset);
 router.post("/reset-password", userController.resetPassword);
 
 router.post("/auth/microsoft", userController.microsoftSignIn);
+router.post("/auth/google", userController.googleSignIn);
 
 // admin routes
 router.get('/list', allowedRoles('admin'), userController.listUsers)

@@ -12,4 +12,5 @@ export interface IUserService {
     updatePassword(data: UpdatePasswordDto): Promise<string>;
     toggleBlockStatus(id: string, isBlocked: boolean): Promise<string>;
     verifyMicrosoftUser(accessToken: string, role: UserRole): Promise<UserDto>;
+    verifyGoogleUser(accessToken: string, role: UserRole): Promise<UserDto>;
 }

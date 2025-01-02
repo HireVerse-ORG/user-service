@@ -16,7 +16,26 @@ export class UserController extends BaseController {
     @inject(TYPES.UserService) private userService!: IUserService;
 
         /**
-    * @route PUT /user/auth/microsoft
+    * @route POST /user/auth/google
+    * @scope Public
+    **/
+    public googleSignIn = asyncWrapper(async (req: AuthRequest, res: Response) => {
+        const { gToken, role } = req.body;
+        const user = await this.userService.verifyGoogleUser(gToken, role);
+        const token = tokenService.generateToken({
+            userId: user.id,
+            role: user.role,
+            isVerified: user.isVerified,
+            isBlocked: user.isBlocked,
+        })
+        res.json({
+            user,
+            token
+        });
+    });
+
+        /**
+    * @route POST /user/auth/microsoft
     * @scope Public
     **/
     public microsoftSignIn = asyncWrapper(async (req: AuthRequest, res: Response) => {

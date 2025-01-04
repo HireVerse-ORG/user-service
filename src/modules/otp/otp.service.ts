@@ -16,6 +16,13 @@ export class OtpService implements IOtpService {
     }
 
     public async saveOtp(dto: GenerateOtpDto, otp: string): Promise<void> {
+        const existingOtp = await this.otpRepo.findByEmail(dto.email);
+        if(existingOtp){
+            existingOtp.createdAt = new Date();
+            existingOtp.otp = otp;
+            await existingOtp.save();
+            return;
+        }
         await this.otpRepo.create({ email: dto.email, otp })
     }
 

@@ -4,6 +4,7 @@ import cors from 'cors';
 import { tokenService } from '../../core/utils/token';
 
 export function registerMiddlewares(app: Application) {
+    app.set("trust proxy", true);
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(morgan("dev"));

@@ -5,15 +5,14 @@ import { inject, injectable } from "inversify";
 import TYPES from '../../core/container/container.types';
 import asyncWrapper from '@hireverse/service-common/dist/utils/asyncWrapper';
 import { AuthRequest } from '@hireverse/service-common/dist/token/user/userRequest';
-import { resettokenService, tokenService } from '../../core/utils/token';
-import { notificationClient } from '../../core/rpc/clients';
-import { mapGrpcErrorToHttpStatus } from '@hireverse/service-common/dist/utils/helper';
-import resetPassTemplate from '../../core/utils/htmlTemplates/resetPassTemplate';
-import { BadRequestError } from '@hireverse/service-common/dist/app.errors';
+import { INotificationService } from '../external/notification/notification.service.interface';
+import { ITokenService } from '../external/token/token.service.interface';
 
 @injectable()
 export class UserController extends BaseController {
     @inject(TYPES.UserService) private userService!: IUserService;
+    @inject(TYPES.TokenService) private tokenService!: ITokenService; 
+    @inject(TYPES.NotificationService) private notificationService!: INotificationService; 
 
         /**
     * @route POST /user/auth/google
@@ -22,16 +21,8 @@ export class UserController extends BaseController {
     public googleSignIn = asyncWrapper(async (req: AuthRequest, res: Response) => {
         const { gToken, role } = req.body;
         const user = await this.userService.verifyGoogleUser(gToken, role);
-        const token = tokenService.generateToken({
-            userId: user.id,
-            role: user.role,
-            isVerified: user.isVerified,
-            isBlocked: user.isBlocked,
-        })
-        res.json({
-            user,
-            token
-        });
+        const token = this.tokenService.generateUserToken(user);
+        res.json({user, token});
     });
 
         /**
@@ -41,16 +32,8 @@ export class UserController extends BaseController {
     public microsoftSignIn = asyncWrapper(async (req: AuthRequest, res: Response) => {
         const { msToken, role } = req.body;
         const user = await this.userService.verifyMicrosoftUser(msToken, role);
-        const token = tokenService.generateToken({
-            userId: user.id,
-            role: user.role,
-            isVerified: user.isVerified,
-            isBlocked: user.isBlocked,
-        })
-        res.json({
-            user,
-            token
-        });
+        const token = this.tokenService.generateUserToken(user);
+        res.json({user, token});
     });
 
     /**
@@ -60,16 +43,8 @@ export class UserController extends BaseController {
     public login = asyncWrapper(async (req: Request, res: Response) => {
         const { email, password } = req.body;
         const user = await this.userService.validateUser({ email, password });
-        const token = tokenService.generateToken({
-            userId: user.id,
-            role: user.role,
-            isVerified: user.isVerified,
-            isBlocked: user.isBlocked,
-        })
-        res.json({
-            user,
-            token
-        });
+        const token = this.tokenService.generateUserToken(user);
+        res.json({user, token});
     });
 
     /**
@@ -99,20 +74,13 @@ export class UserController extends BaseController {
     public requestPasswordReset = asyncWrapper(async (req: AuthRequest, res: Response) => {
         const { email } = req.body;
         const user = await this.userService.getUserByEmail(email);
-
-        const expiry = new Date(Date.now() + 300000).toISOString();
-        const resetToken = resettokenService.generateToken({ userid: user.id }, '5m');
-        const resetUrl = `${process.env.CLIENT_ORIGIN}/auth/reset-password?token=${resetToken}&&expiry=${expiry}`;
-        const html = resetPassTemplate(resetUrl);
-        notificationClient.SendMail({ to: user.email, subject: "Password Reset Request", html }, (error: any | null, response: any) => {
-            if (error) {
-                const status = mapGrpcErrorToHttpStatus(error);
-                const message = error.details;
-                return res.status(status).json({ message })
-            }
-
-            return res.json({ message: "Password reset email sent" });
-        })
+        const resetToken = this.tokenService.generateResetPasswordToken({ userid: user.id });
+        try {
+            const response = await this.notificationService.sendResetPasswordEmail(email, resetToken);
+            return res.status(response.status).json(response.message);
+        } catch (error: any) {
+            return res.status(error.status).json(error.message);
+        }
     })
 
     /**
@@ -121,19 +89,10 @@ export class UserController extends BaseController {
    **/
     public resetPassword = asyncWrapper(async (req: AuthRequest, res: Response) => {
         const { token, newPassword, confirmPassword } = req.body;
-
         if (newPassword !== confirmPassword) {
             return res.status(400).json({ message: "Passwords do not match" });
         }
-
-        let userid: string;
-        try {
-            const decoded = resettokenService.verifyToken(token);
-            userid = decoded.userid;
-        } catch (error) {
-            return res.status(400).json({ message: 'Invalid or expired token' });
-        }
-
+        const {userid} = this.tokenService.verifyResetPasswordToken(token);
         await this.userService.updatePassword({ userid, password: newPassword });
         return res.json({ message: `Password updated succesfully` })
     })

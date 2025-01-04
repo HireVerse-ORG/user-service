@@ -9,5 +9,7 @@ export default {
     OtpService: Symbol('OtpService'),
     OtpController: Symbol('OtpController'),
     OtpRepository: Symbol('OtpRepository'),
+    NotificationService: Symbol('NotificationService'),
+    TokenService: Symbol('TokenService'),
   };
   

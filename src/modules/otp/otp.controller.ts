@@ -1,19 +1,20 @@
+import { Request, Response } from 'express';
 import { inject, injectable } from "inversify";
 import BaseController from "../../core/base.controller";
 import { IOtpService } from "./interfaces/otp.service.interface";
 import TYPES from "../../core/container/container.types";
-import { Request, Response } from 'express';
 import asyncWrapper from '@hireverse/service-common/dist/utils/asyncWrapper';
-import {mapGrpcErrorToHttpStatus} from '@hireverse/service-common/dist/utils/helper';
-import { tokenService } from "../../core/utils/token";
 import { IUserService } from "../user/interfaces/user.service.interface";
-import { notificationClient } from "../../core/rpc/clients";
-import otpTemplate from "../../core/utils/htmlTemplates/otpTemplate";
+import { INotificationService } from "../external/notification/notification.service.interface";
+import { ITokenService } from "../external/token/token.service.interface";
 
 @injectable()
 export class OtpController extends BaseController {
   @inject(TYPES.OtpService) private otpService!: IOtpService;
   @inject(TYPES.UserService) private userService!: IUserService;
+  @inject(TYPES.TokenService) private tokenService!: ITokenService; 
+  @inject(TYPES.NotificationService) private notificationService!: INotificationService;
+  
 
   /**
 * @route POST /user/send-otp
@@ -23,17 +24,13 @@ export class OtpController extends BaseController {
     const { email } = req.body;
     const user = await this.userService.getUserByEmail(email);
     const otp = this.otpService.generateOtp();
-    await this.otpService.saveOtp({email: user.email}, otp.toString());
-    const html = otpTemplate(otp.toString());
-    notificationClient.SendMail({ to: user.email, subject: "Email Verification", html }, (error: any | null, response: any) => {
-      if (error) {
-        const status = mapGrpcErrorToHttpStatus(error);
-        const message = error.details;
-        return res.status(status).json({ message })
-      }
-
-      return res.json({ message: "Otp created sucessfully" });
-    })
+    await this.otpService.saveOtp({ email: user.email }, otp.toString());
+    try {
+      const response = await this.notificationService.sendOtpEmail(email, otp.toString());
+      return res.status(response.status).json(response.message);
+    } catch (error: any) {
+      return res.status(error.status).json(error.message);
+    }
   });
 
   /**
@@ -49,15 +46,7 @@ export class OtpController extends BaseController {
       });
     }
     const user = await this.userService.verifyUser(email);
-    const token = tokenService.generateToken({
-      userId: user.id,
-      role: user.role,
-      isVerified: user.isVerified,
-      isBlocked: user.isBlocked,
-    })
-    res.json({
-      user,
-      token
-    });
+    const token = this.tokenService.generateUserToken(user);
+    res.json({user, token});
   });
 }

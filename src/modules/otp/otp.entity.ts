@@ -19,17 +19,11 @@ const otpSchema = new mongoose.Schema<IOTP>(
 
 // Hash the OTP before saving
 otpSchema.pre<IOTP>("save", async function (next) {
-    if (!this.isModified("otp")) {
-        return next();
-    }
-
-    try {
+    if (this.isModified("otp")) {
         const salt = await bcrypt.genSalt(10);
         this.otp = await bcrypt.hash(this.otp, salt);
-        next();
-    } catch (err) {
-        next(err as any);
     }
+    next();
 });
 
 otpSchema.methods.verifyOtp = async function (userOtp: string): Promise<boolean> {

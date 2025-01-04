@@ -166,6 +166,27 @@ export class UserService implements IUserService {
     }
   }
 
+  async setRefreshToken(id: string, token: string): Promise<string> {
+    const user = await this.repo.update(id, { refreshToken: token});
+    if(!user){
+      throw new NotFoundError("User not found");
+    }
+
+    return "Refresh token updated";
+  }
+
+  async getRefreshToken(id: string): Promise<string> {
+    if(!isValidObjectId(id)){
+      throw new BadRequestError("Invalid userId");
+    }
+
+    const user =  await this.repo.findById(id);
+    if(!user){
+      throw new NotFoundError("User not found");
+    }
+    return user.refreshToken;
+  }
+
   private userResponse(userData: IUser): UserDto {
     return {
       id: userData.id,

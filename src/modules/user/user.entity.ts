@@ -15,6 +15,7 @@ export interface IUser extends Document {
     role: UserRole;
     isVerified: boolean;
     isBlocked: boolean;
+    refreshToken: string;
     createdAt: Date;
     updatedAt: Date;
     validatePassword(password: string): Promise<boolean>;
@@ -32,6 +33,7 @@ const userSchema = new Schema<IUser>(
         },
         isVerified: { type: Boolean, default: false },
         isBlocked: { type: Boolean, default: false },
+        refreshToken: { type: String},
     },
     { timestamps: true } 
 );

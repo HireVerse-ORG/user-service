@@ -13,4 +13,6 @@ export interface IUserService {
     toggleBlockStatus(id: string, isBlocked: boolean): Promise<string>;
     verifyMicrosoftUser(accessToken: string, role: UserRole): Promise<UserDto>;
     verifyGoogleUser(accessToken: string, role: UserRole): Promise<UserDto>;
+    setRefreshToken(id: string, token: string): Promise<string>;
+    getRefreshToken(id: string): Promise<string>
 }

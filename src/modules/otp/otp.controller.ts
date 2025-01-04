@@ -47,6 +47,8 @@ export class OtpController extends BaseController {
     }
     const user = await this.userService.verifyUser(email);
     const token = this.tokenService.generateUserToken(user);
+    const refreashToken = this.tokenService.generateRefreshToken(user);
+    await this.userService.setRefreshToken(user.id, refreashToken);
     res.json({user, token});
   });
 }

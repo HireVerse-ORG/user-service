@@ -22,6 +22,8 @@ export class UserController extends BaseController {
         const { gToken, role } = req.body;
         const user = await this.userService.verifyGoogleUser(gToken, role);
         const token = this.tokenService.generateUserToken(user);
+        const refreashToken = this.tokenService.generateRefreshToken(user);
+        await this.userService.setRefreshToken(user.id, refreashToken);
         res.json({user, token});
     });
 
@@ -33,6 +35,8 @@ export class UserController extends BaseController {
         const { msToken, role } = req.body;
         const user = await this.userService.verifyMicrosoftUser(msToken, role);
         const token = this.tokenService.generateUserToken(user);
+        const refreashToken = this.tokenService.generateRefreshToken(user);
+        await this.userService.setRefreshToken(user.id, refreashToken);
         res.json({user, token});
     });
 
@@ -44,6 +48,8 @@ export class UserController extends BaseController {
         const { email, password } = req.body;
         const user = await this.userService.validateUser({ email, password });
         const token = this.tokenService.generateUserToken(user);
+        const refreashToken = this.tokenService.generateRefreshToken(user);
+        await this.userService.setRefreshToken(user.id, refreashToken);
         res.json({user, token});
     });
 
@@ -95,6 +101,19 @@ export class UserController extends BaseController {
         const {userid} = this.tokenService.verifyResetPasswordToken(token);
         await this.userService.updatePassword({ userid, password: newPassword });
         return res.json({ message: `Password updated succesfully` })
+    })
+
+    /**
+   * @route POST /user/refresh-token
+   * @scope Public
+   **/
+    public refresToken = asyncWrapper(async (req: AuthRequest, res: Response) => {
+        const {userId} = req.body;
+        const refreshToken = await this.userService.getRefreshToken(userId);
+        this.tokenService.verifyRefreshToken(refreshToken);
+        const user = await this.userService.getUserById(userId);
+        const token = this.tokenService.generateUserToken(user);
+        return res.json({ token });
     })
 
     /**

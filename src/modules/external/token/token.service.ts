@@ -12,7 +12,24 @@ export class TokenService implements ITokenService {
             role: payload.role,
             isVerified: payload.isVerified,
             isBlocked: payload.isBlocked,
-        });
+        }, '15m');
+    }
+    
+    generateRefreshToken(payload: UserDto): string {
+        return tokenService.generateToken({
+            userId: payload.id,
+            role: payload.role,
+            isVerified: payload.isVerified,
+            isBlocked: payload.isBlocked,
+        }, '7d');
+    }
+
+    verifyRefreshToken(token: string) {
+        try {
+           return tokenService.verifyToken(token);
+        } catch (error) {
+            throw new BadRequestError("Invalid or expired token")
+        }
     }
 
     generateResetPasswordToken(payload: { userid: string; }): string {

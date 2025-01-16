@@ -118,7 +118,7 @@ export class UserService implements IUserService {
     }
   }
 
-  async verifyMicrosoftUser(accessToken: string, role: UserRole): Promise<UserDto> {
+  async verifyMicrosoftUser(accessToken: string, role: UserRole) {
     try {
       const {name, email, sub} = await verifyMsToken(accessToken, microsoftConfig.clientId, microsoftConfig.authority);
       if(!email){
@@ -128,18 +128,20 @@ export class UserService implements IUserService {
         throw new Error("Failed to autheticate using Microsoft");
       }
       let user = await this.repo.findOne({email});
+      let created= false;
       if(!user){
+        created = true;
         user = await this.repo.create({email, fullname: name, password: sub, role, isVerified: true});
       } else if(!user.isVerified){
         await this.repo.update(user.id, {isVerified: true});
       }
-      return this.userResponse(user);
+      return {created, user: this.userResponse(user)};
     } catch (error: any) {
       throw new BadRequestError(error.message);
     }
   }
 
-  async verifyGoogleUser(accessToken: string, role: UserRole): Promise<UserDto> {
+  async verifyGoogleUser(accessToken: string, role: UserRole) {
     try {
 
       const {name, email, sub} = await fetchGoogleUserInfo(accessToken);
@@ -153,14 +155,15 @@ export class UserService implements IUserService {
       }
 
       let user = await this.repo.findOne({email: email});
+      let created= false;
       if(!user){
+        created = true;
         user = await this.repo.create({email, fullname: name, password: sub, role, isVerified: true});
       } else if(!user.isVerified){
         await this.repo.update(user.id, {isVerified: true});
       }
 
-      return this.userResponse(user);
-
+      return {created, user: this.userResponse(user)};
     } catch (error: any) {
       throw new BadRequestError(error.message);
     }

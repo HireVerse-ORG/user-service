@@ -19,7 +19,8 @@ router.post("/auth/microsoft", userController.microsoftSignIn);
 router.post("/auth/google", userController.googleSignIn);
 
 // admin routes
-router.get('/list', allowedRoles('admin'), userController.listUsers)
-router.put('/block-user', allowedRoles('admin'), userController.toggleUserBlockStatus)
+router.get('/list', allowedRoles('admin'), userController.listUsers);
+router.get('/list/companies', allowedRoles('admin'), userController.listCompanies);
+router.put('/block-user', allowedRoles('admin'), userController.toggleUserBlockStatus);
 
 export const userRoutes = router;

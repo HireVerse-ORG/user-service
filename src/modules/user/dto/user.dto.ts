@@ -33,3 +33,7 @@ export interface UserDto {
     isBlocked: boolean;
     createAt: Date;
 }
+
+export interface ProfileUser extends UserDto {
+    profile: any;
+}

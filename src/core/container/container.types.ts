@@ -9,7 +9,11 @@ export default {
     OtpService: Symbol('OtpService'),
     OtpController: Symbol('OtpController'),
     OtpRepository: Symbol('OtpRepository'),
+
+    // external
     NotificationService: Symbol('NotificationService'),
     TokenService: Symbol('TokenService'),
+    ProfileService: Symbol('ProfileService'),
+    PaymentService: Symbol('PaymentService'),
   };
   

@@ -34,7 +34,6 @@ export class UserController extends BaseController {
                 } else if (user.role === "company") {
                     await this.paymentService.createCompanyFreePlan({ email: user.email, name: user.fullname, userId: user.id })
                 }
-                return res.status(201).json({ user });
             }
         } catch (error: any) {
             // return res.status(error.status).json(error.message);
@@ -42,7 +41,8 @@ export class UserController extends BaseController {
         const token = this.tokenService.generateUserToken(user);
         const refreashToken = this.tokenService.generateRefreshToken(user);
         await this.userService.setRefreshToken(user.id, refreashToken);
-        res.json({ user, token });
+        const status = created ? 201 : 200;
+        res.status(status).json({ user, token });
     });
 
     /**
@@ -60,7 +60,6 @@ export class UserController extends BaseController {
                 } else if (user.role === "company") {
                     await this.paymentService.createCompanyFreePlan({ email: user.email, name: user.fullname, userId: user.id })
                 }
-                return res.status(201).json({ user });
             }
         } catch (error: any) {
             // return res.status(error.status).json(error.message);
@@ -68,7 +67,8 @@ export class UserController extends BaseController {
         const token = this.tokenService.generateUserToken(user);
         const refreashToken = this.tokenService.generateRefreshToken(user);
         await this.userService.setRefreshToken(user.id, refreashToken);
-        res.json({ user, token });
+        const status = created ? 201 : 200;
+        res.status(status).json({ user, token });
     });
 
     /**
@@ -172,7 +172,7 @@ export class UserController extends BaseController {
     * @scope Private for admin
     **/
     public listCompanies = asyncWrapper(async (req: AuthRequest, res: Response) => {
-        const { page = 1, limit = 10, query, status } = req.query;
+        const { page = 1, limit = 10, query } = req.query;
 
         const data = await this.userService.getUsersByRole("company", page as number, limit as number, query as string);
 
@@ -188,14 +188,7 @@ export class UserController extends BaseController {
             })
         );
 
-        if (status === "rejected") {
-            data.data = usersWithProfiles.filter((user) => user.profile?.status === "rejected");
-        } else if (status === "requested") {
-            data.data = usersWithProfiles.filter((user) => user.profile?.status === "pending");
-        } else {
-            data.data = usersWithProfiles;
-        }
-
+        data.data = usersWithProfiles;
         return res.json(data);
     });
 

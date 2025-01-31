@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@hireverse/service-common": "^1.0.7",
-    "@hireverse/service-protos": "^1.0.2",
+    "@hireverse/service-protos": "^1.0.3",
     "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",

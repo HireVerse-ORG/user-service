@@ -7,6 +7,7 @@ import { container } from "../../core/container";
 const router = Router();
 const userController = container.get<UserController>(TYPES.UserController)
 
+// baseurl: 
 router.get("/", isAuthenticated, userController.getUser);
 
 router.post("/login", userController.login);
@@ -22,5 +23,6 @@ router.post("/auth/google", userController.googleSignIn);
 router.get('/list', allowedRoles('admin'), userController.listUsers);
 router.get('/list/companies', allowedRoles('admin'), userController.listCompanies);
 router.put('/block-user', allowedRoles('admin'), userController.toggleUserBlockStatus);
+router.get('/statistics', allowedRoles('admin'), userController.getUserStatistics);
 
 export const userRoutes = router;

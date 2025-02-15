@@ -201,4 +201,16 @@ export class UserController extends BaseController {
         await this.userService.toggleBlockStatus(userId, isBlocked);
         return res.json({ message: `User block status updated to ${isBlocked}` });
     });
+    /**
+  * @route PUT /user/statistics
+  * @scope Private for admin
+  **/
+    public getUserStatistics = asyncWrapper(async (req: AuthRequest, res: Response) => {
+        try {
+            const statistics = await this.userService.getUserStatistics();
+            return res.json(statistics)
+        } catch (error) {
+            return res.status(500).json({message: "Failed to fetch User staistics"})
+        }
+    });
 }

@@ -14,5 +14,9 @@ export interface IUserService {
     verifyMicrosoftUser(accessToken: string, role: UserRole): Promise<{created: boolean, user: UserDto}>;
     verifyGoogleUser(accessToken: string, role: UserRole): Promise<{created: boolean, user: UserDto}>;
     setRefreshToken(id: string, token: string): Promise<string>;
-    getRefreshToken(id: string): Promise<string>
+    getRefreshToken(id: string): Promise<string>;
+    getUserStatistics(): Promise<{
+        total: number;
+        monthlyGrowth: Array<{ month: string; count: number }>;
+    }>
 }

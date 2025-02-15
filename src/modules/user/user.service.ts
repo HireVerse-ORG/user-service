@@ -120,22 +120,22 @@ export class UserService implements IUserService {
 
   async verifyMicrosoftUser(accessToken: string, role: UserRole) {
     try {
-      const {name, email, sub} = await verifyMsToken(accessToken, microsoftConfig.clientId, microsoftConfig.authority);
-      if(!email){
+      const { name, email, sub } = await verifyMsToken(accessToken, microsoftConfig.clientId, microsoftConfig.authority);
+      if (!email) {
         throw new Error("Microsoft account does not have an email associated");
       }
       if (!name || !sub) {
         throw new Error("Failed to autheticate using Microsoft");
       }
-      let user = await this.repo.findOne({email});
-      let created= false;
-      if(!user){
+      let user = await this.repo.findOne({ email });
+      let created = false;
+      if (!user) {
         created = true;
-        user = await this.repo.create({email, fullname: name, password: sub, role, isVerified: true});
-      } else if(!user.isVerified){
-        await this.repo.update(user.id, {isVerified: true});
+        user = await this.repo.create({ email, fullname: name, password: sub, role, isVerified: true });
+      } else if (!user.isVerified) {
+        await this.repo.update(user.id, { isVerified: true });
       }
-      return {created, user: this.userResponse(user)};
+      return { created, user: this.userResponse(user) };
     } catch (error: any) {
       throw new BadRequestError(error.message);
     }
@@ -144,7 +144,7 @@ export class UserService implements IUserService {
   async verifyGoogleUser(accessToken: string, role: UserRole) {
     try {
 
-      const {name, email, sub} = await fetchGoogleUserInfo(accessToken);
+      const { name, email, sub } = await fetchGoogleUserInfo(accessToken);
 
       if (!email) {
         throw new Error("Google account does not have an email associated");
@@ -154,24 +154,24 @@ export class UserService implements IUserService {
         throw new Error("Failed to autheticate using Google");
       }
 
-      let user = await this.repo.findOne({email: email});
-      let created= false;
-      if(!user){
+      let user = await this.repo.findOne({ email: email });
+      let created = false;
+      if (!user) {
         created = true;
-        user = await this.repo.create({email, fullname: name, password: sub, role, isVerified: true});
-      } else if(!user.isVerified){
-        await this.repo.update(user.id, {isVerified: true});
+        user = await this.repo.create({ email, fullname: name, password: sub, role, isVerified: true });
+      } else if (!user.isVerified) {
+        await this.repo.update(user.id, { isVerified: true });
       }
 
-      return {created, user: this.userResponse(user)};
+      return { created, user: this.userResponse(user) };
     } catch (error: any) {
       throw new BadRequestError(error.message);
     }
   }
 
   async setRefreshToken(id: string, token: string): Promise<string> {
-    const user = await this.repo.update(id, { refreshToken: token});
-    if(!user){
+    const user = await this.repo.update(id, { refreshToken: token });
+    if (!user) {
       throw new NotFoundError("User not found");
     }
 
@@ -179,15 +179,19 @@ export class UserService implements IUserService {
   }
 
   async getRefreshToken(id: string): Promise<string> {
-    if(!isValidObjectId(id)){
+    if (!isValidObjectId(id)) {
       throw new BadRequestError("Invalid userId");
     }
 
-    const user =  await this.repo.findById(id);
-    if(!user){
+    const user = await this.repo.findById(id);
+    if (!user) {
       throw new NotFoundError("User not found");
     }
     return user.refreshToken;
+  }
+
+  async getUserStatistics() {
+    return this.repo.getRegistrationStatistics();
   }
 
   private userResponse(userData: IUser): UserDto {

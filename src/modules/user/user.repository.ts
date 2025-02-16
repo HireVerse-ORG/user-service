@@ -26,7 +26,7 @@ export class UserRepository extends MongoBaseRepository<IUser> implements IUserR
     async getUserGrowth(): Promise<Array<{ month: string; count: number }>> {
         const currentYear = new Date().getFullYear();
         
-        return this.repository.aggregate([
+        const aggregatedData = await this.repository.aggregate([
             {
                 $project: {
                     year: { $year: "$createdAt" },
@@ -52,7 +52,7 @@ export class UserRepository extends MongoBaseRepository<IUser> implements IUserR
                         $let: {
                             vars: {
                                 months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-                                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+                                         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
                             },
                             in: { 
                                 $arrayElemAt: [
@@ -66,7 +66,16 @@ export class UserRepository extends MongoBaseRepository<IUser> implements IUserR
                 }
             }
         ]).exec();
+    
+        const allMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const growthData = allMonths.map(month => {
+            const found = aggregatedData.find((item: any) => item.month === month);
+            return { month, count: found ? found.count : 0 };
+        });
+    
+        return growthData;
     }
+    
 
     async getRegistrationStatistics(): Promise<{
         total: number;

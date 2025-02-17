@@ -23,9 +23,9 @@ export class NotificationService implements INotificationService {
         })
     }
 
-    async sendResetPasswordEmail(email: string, resetToken: string): Promise<{ status: number, message: string }> {
+    async sendResetPasswordEmail(email: string, resetToken: string, resetPageLink: string): Promise<{ status: number, message: string }> {
         const expiry = new Date(Date.now() + 300000).toISOString();
-        const resetUrl = `${process.env.CLIENT_ORIGIN}/auth/reset-password?token=${resetToken}&&expiry=${expiry}`;
+        const resetUrl = `${resetPageLink}?token=${resetToken}&&expiry=${expiry}`;
         const html = resetPassTemplate(resetUrl);
 
         return new Promise((resolve, reject) => {

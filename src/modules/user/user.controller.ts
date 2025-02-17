@@ -85,11 +85,11 @@ export class UserController extends BaseController {
    * @scope Public
    **/
     public requestPasswordReset = asyncWrapper(async (req: AuthRequest, res: Response) => {
-        const { email } = req.body;
+        const { email, resetPageLink } = req.body;
         const user = await this.userService.getUserByEmail(email);
         const resetToken = this.tokenService.generateResetPasswordToken({ userid: user.id });
         try {
-            const response = await this.notificationService.sendResetPasswordEmail(email, resetToken);
+            const response = await this.notificationService.sendResetPasswordEmail(email, resetToken, resetPageLink);
             return res.status(response.status).json(response.message);
         } catch (error: any) {
             return res.status(error.status).json(error.message);

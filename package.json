@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@hireverse/kafka-communication": "^1.0.1",
     "@hireverse/service-common": "^1.0.8",
     "@hireverse/service-protos": "^1.0.4",
     "axios": "^1.7.9",

@@ -9,10 +9,12 @@ import { IUser, UserRole } from "./user.entity";
 import { querySanitizer } from "@hireverse/service-common/dist/utils";
 import { microsoftConfig, verifyMsToken } from "../../core/utils/msutil";
 import { fetchGoogleUserInfo } from "../../core/utils/googleutil";
+import { EventService } from "../event/event.service";
 
 @injectable()
 export class UserService implements IUserService {
   @inject(TYPES.UserRepository) private repo!: IUserRepository;
+  @inject(TYPES.EventService) private eventService!: EventService;
 
   async validateUser(data: UserValidateDto) {
     const user = await this.repo.findByEmail(data.email);
@@ -37,6 +39,15 @@ export class UserService implements IUserService {
     }
 
     const user = await this.repo.create({ ...data });
+
+    await this.eventService.userCreatedEvent({
+      userId: user.id,
+      email: user.email,
+      fullName: user.fullname,
+      role: user.role,
+      timeStamp: user.createdAt
+    })
+
     return this.userResponse(user);
   }
 
@@ -110,7 +121,7 @@ export class UserService implements IUserService {
       ];
     }
 
-    const paginatedData = await this.repo.paginate(filter, page, limit);
+    const paginatedData = await this.repo.paginate(filter, page, limit, {sort: {createdAt: -1}});
     const transformedData = paginatedData.data.map(user => this.userResponse(user));
     return {
       ...paginatedData,

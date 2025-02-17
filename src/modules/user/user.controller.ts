@@ -26,18 +26,6 @@ export class UserController extends BaseController {
     public googleSignIn = asyncWrapper(async (req: AuthRequest, res: Response) => {
         const { gToken, role } = req.body;
         const { created, user } = await this.userService.verifyGoogleUser(gToken, role);
-        try {
-            if (created) {
-                if (user.role === "seeker") {
-                    await this.profileService.createSeekerProfile(user.fullname, user.id)
-                    await this.paymentService.createSeekerFreePlan({ email: user.email, name: user.fullname, userId: user.id });
-                } else if (user.role === "company") {
-                    await this.paymentService.createCompanyFreePlan({ email: user.email, name: user.fullname, userId: user.id })
-                }
-            }
-        } catch (error: any) {
-            // return res.status(error.status).json(error.message);
-        }
         const token = this.tokenService.generateUserToken(user);
         const refreashToken = this.tokenService.generateRefreshToken(user);
         await this.userService.setRefreshToken(user.id, refreashToken);
@@ -52,18 +40,6 @@ export class UserController extends BaseController {
     public microsoftSignIn = asyncWrapper(async (req: AuthRequest, res: Response) => {
         const { msToken, role } = req.body;
         const { created, user } = await this.userService.verifyMicrosoftUser(msToken, role);
-        try {
-            if (created) {
-                if (user.role === "seeker") {
-                    await this.profileService.createSeekerProfile(user.fullname, user.id)
-                    await this.paymentService.createSeekerFreePlan({ email: user.email, name: user.fullname, userId: user.id });
-                } else if (user.role === "company") {
-                    await this.paymentService.createCompanyFreePlan({ email: user.email, name: user.fullname, userId: user.id })
-                }
-            }
-        } catch (error: any) {
-            // return res.status(error.status).json(error.message);
-        }
         const token = this.tokenService.generateUserToken(user);
         const refreashToken = this.tokenService.generateRefreshToken(user);
         await this.userService.setRefreshToken(user.id, refreashToken);
@@ -91,16 +67,6 @@ export class UserController extends BaseController {
     public create = asyncWrapper(async (req: Request, res: Response) => {
         const { fullname, email, password, role } = req.body;
         const user = await this.userService.createUser({ fullname, email, password, role });
-        try {
-            if (user.role === "seeker") {
-                await this.profileService.createSeekerProfile(user.fullname, user.id);
-                await this.paymentService.createSeekerFreePlan({ email: user.email, name: user.fullname, userId: user.id });
-            } else if (user.role === "company") {
-                await this.paymentService.createCompanyFreePlan({ email: user.email, name: user.fullname, userId: user.id })
-            }
-        } catch (error: any) {
-            //    console.log(error);
-        }
         return res.status(201).json({ user });
     })
 

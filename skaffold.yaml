@@ -7,7 +7,7 @@ build:
     - image: hireverse/user-server
       docker:
         dockerfile: Dockerfile
-        target: development
+        target: production
 manifests:
   rawYaml:
     - k8s/user-depl.yaml

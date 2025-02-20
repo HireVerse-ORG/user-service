@@ -10,5 +10,4 @@ build:
         target: production
 manifests:
   rawYaml:
-    - k8s/user-depl.yaml
-    - k8s/user.secrets.yaml
+    - k8s/*

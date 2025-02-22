@@ -10,6 +10,7 @@ import { ITokenService } from '../external/token/token.service.interface';
 import { IProfileService } from '../external/profile/profile.service.interface';
 import { ProfileUser } from './dto/user.dto';
 import { IPaymentService } from '../external/payment/payment.service.interface';
+import { EventService } from '../event/event.service';
 
 @injectable()
 export class UserController extends BaseController {
@@ -17,7 +18,8 @@ export class UserController extends BaseController {
     @inject(TYPES.TokenService) private tokenService!: ITokenService;
     @inject(TYPES.NotificationService) private notificationService!: INotificationService;
     @inject(TYPES.ProfileService) private profileService!: IProfileService;
-    @inject(TYPES.PaymentService) private paymentService!: IPaymentService;
+    @inject(TYPES.EventService) private eventService!: EventService;
+    
 
     /**
 * @route POST /user/auth/google
@@ -26,6 +28,15 @@ export class UserController extends BaseController {
     public googleSignIn = asyncWrapper(async (req: AuthRequest, res: Response) => {
         const { gToken, role } = req.body;
         const { created, user } = await this.userService.verifyGoogleUser(gToken, role);
+        if(created){
+            await this.eventService.userCreatedEvent({
+                userId: user.id,
+                email: user.email,
+                fullName: user.fullname,
+                role: user.role,
+                timeStamp: user.createAt
+            })
+        }
         const token = this.tokenService.generateUserToken(user);
         const refreashToken = this.tokenService.generateRefreshToken(user);
         await this.userService.setRefreshToken(user.id, refreashToken);
@@ -40,6 +51,15 @@ export class UserController extends BaseController {
     public microsoftSignIn = asyncWrapper(async (req: AuthRequest, res: Response) => {
         const { msToken, role } = req.body;
         const { created, user } = await this.userService.verifyMicrosoftUser(msToken, role);
+        if(created){
+            await this.eventService.userCreatedEvent({
+                userId: user.id,
+                email: user.email,
+                fullName: user.fullname,
+                role: user.role,
+                timeStamp: user.createAt
+            })
+        }
         const token = this.tokenService.generateUserToken(user);
         const refreashToken = this.tokenService.generateRefreshToken(user);
         await this.userService.setRefreshToken(user.id, refreashToken);
@@ -67,6 +87,13 @@ export class UserController extends BaseController {
     public create = asyncWrapper(async (req: Request, res: Response) => {
         const { fullname, email, password, role } = req.body;
         const user = await this.userService.createUser({ fullname, email, password, role });
+        await this.eventService.userCreatedEvent({
+            userId: user.id,
+            email: user.email,
+            fullName: user.fullname,
+            role: user.role,
+            timeStamp: user.createAt
+        })
         return res.status(201).json({ user });
     })
 

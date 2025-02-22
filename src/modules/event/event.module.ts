@@ -21,7 +21,7 @@ const kafkaConnect = new KafkaConnect({
     }
 })
 
-export const Producer = new kafka.KafkaProducer(kafkaConnect, {allowAutoTopicCreation: true});
+export const Producer = new kafka.KafkaProducer(kafkaConnect, {allowAutoTopicCreation: process.env.KAFKA_AUTO_CREATE_TOPICS === "true"});
 
 export function loadEventContainer(container: Container) {
     container.bind<KafkaProducer>(TYPES.KafkaProducer).toConstantValue(Producer);
